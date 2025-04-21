@@ -11,6 +11,8 @@ from langchain.docstore.document import Document
 from langchain_community.graphs import Neo4jGraph
 from llm import generate_graphDocuments
 from shared.common_fn import load_embedding_model, save_graphDocuments_in_neo4j,get_chunk_and_graphDocument,delete_uploaded_local_file
+import shutil
+from local_file import get_documents_from_file_by_path
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level="INFO")
 class CreateChunksofDocument:
@@ -352,3 +354,30 @@ def processing_source(graph, model, file_name, text_data, allowedNodes, allowedR
         }
     else:
         logging.info(f'File {file_name} is already in "Processing" status.')
+
+def extract_graph_from_file_local_file(graph, model, merged_file_path, fileName, allowedNodes, allowedRelationship,uri):
+
+    logging.info(f'Process file name :{fileName}')
+    file_name, pages, file_extension = get_documents_from_file_by_path(merged_file_path,fileName)
+    if pages==None or len(pages)==0:
+        raise Exception(f'File content is not available for file : {file_name}')
+
+    return processing_source(graph, model, file_name, pages, allowedNodes, allowedRelationship, True, merged_file_path, uri)
+
+def merge_chunks_local(file_name, total_chunks, chunk_dir, merged_dir):
+    if not os.path.exists(merged_dir):
+        os.mkdir(merged_dir)
+    logging.info(f'Merged File Path: {merged_dir}')
+    merged_file_path = os.path.join(merged_dir, file_name)
+    with open(merged_file_path, "wb") as write_stream:
+        for i in range(1,total_chunks+1):
+            chunk_file_path = os.path.join(chunk_dir, f"{file_name}_part_{i}")
+            logging.info(f'Chunk File Path While Merging Parts:{chunk_file_path}')
+            with open(chunk_file_path, "rb") as chunk_file:
+                shutil.copyfileobj(chunk_file, write_stream)
+            os.unlink(chunk_file_path)  # Delete the individual chunk file after merging
+    logging.info("Chunks merged successfully and return file size")
+    file_name, pages, _ = get_documents_from_file_by_path(merged_file_path,file_name)
+    pdf_total_pages = pages[0].metadata['total_pages']
+    file_size = os.path.getsize(merged_file_path)
+    return pdf_total_pages,file_size

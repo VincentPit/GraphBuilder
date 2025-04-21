@@ -2,8 +2,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_core.documents import Document
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 def get_documents_from_web_page(source_url:str):
   try:

@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from graphTransformer import LLMGraphTransformer
 
+
 def generate_graphDocuments(model: str, graph: Neo4jGraph, chunkId_chunkDoc_list: List, allowedNodes=None, allowedRelationship=None):
     
     if  allowedNodes is None or allowedNodes=="":

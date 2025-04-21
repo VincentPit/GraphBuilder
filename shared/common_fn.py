@@ -60,7 +60,6 @@ def create_graph_database_connection(uri, userName, password, database):
     graph = Neo4jGraph(url=uri, database=database, username=userName, password=password, refresh_schema=False, sanitize=True)    
   return graph
 
-
 def load_embedding_model(embedding_model_name: str):
     if embedding_model_name.startswith("iic"):
         local_dir = "../data/embedding/"
