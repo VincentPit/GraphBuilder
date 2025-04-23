@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 # Set the working directory
-WORKDIR .
+WORKDIR code
 
 # Install dependencies (Miniconda and other system dependencies)
 RUN apt-get update && \

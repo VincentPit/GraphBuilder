@@ -23,7 +23,7 @@ allowedRelationship = ""
 CHUNK_DIR = os.path.join(os.path.dirname(__file__), "chunks")
 MERGED_DIR = os.path.join(os.path.dirname(__file__), "data")
 
-file_name = "products_wiki_zh.json"
+file_name = "./data/products_wiki_zh.json"
 
 
 graph = create_graph_database_connection(uri, userName, password, database)   
