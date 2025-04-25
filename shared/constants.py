@@ -1,4 +1,5 @@
 MODEL_VERSIONS = {
+        "azure": "",
         "openai-gpt-3.5": "gpt-3.5-turbo-16k",
         "gemini-1.0-pro": "gemini-1.0-pro-001",
         "gemini-1.5-pro": "gemini-1.5-pro-preview-0514",

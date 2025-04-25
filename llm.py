@@ -3,6 +3,7 @@ from shared.constants import MODEL_VERSIONS
 from langchain_openai import AzureChatOpenAI
 from langchain.docstore.document import Document
 from langchain_community.graphs import Neo4jGraph
+from typing import List
 import os
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
@@ -31,13 +32,12 @@ def generate_graphDocuments(model: str, graph: Neo4jGraph, chunkId_chunkDoc_list
     return graph_documents
 
 
-def get_llm(model_version = "azure"):
+def get_llm(model_version = "azure_ai_gpt_4o"):
     """Retrieve the specified language model based on the model name."""
     env_key = "LLM_MODEL_CONFIG_" + model_version
     env_value = os.environ.get(env_key)
     logging.info("Model: {}".format(env_key))
-    model_name = MODEL_VERSIONS[model_version]
-
+    #model_name = MODEL_VERSIONS[model_version]
 
     if "azure" in model_version.lower():
         model_name, api_endpoint, api_key, api_version = env_value.split(",")
