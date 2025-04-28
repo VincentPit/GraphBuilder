@@ -1,61 +1,47 @@
-import logging
-import requests
+import asyncio
+import aiohttp
 from bs4 import BeautifulSoup
-from langchain_community.document_loaders import WebBaseLoader
 from urllib.parse import urljoin
+import logging
 
-def get_documents_from_web_page(source_url:str):
-  try:
-    pages = WebBaseLoader(source_url).load()
-    file_name = pages[0].metadata['title']
-    return file_name, pages
-  except Exception as e:
-    job_status = "Failed"
-    message="Failed To Process Web URL"
-    error_message = str(e)
-    logging.error(f"Failed To Process Web URL: {file_name}")
-    logging.exception(f'Exception Stack trace: {error_message}')
-    return 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+visited = set()
 
-def get_documents_from_web_pageX(source_url: str, max_depth: int = 2) -> dict:
-    visited_urls = set()
-    url_to_documents = {}
+async def extract_links(url):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                html = await response.text()
+                soup = BeautifulSoup(html, 'html.parser')
+                return [urljoin(url, a.get('href')) for a in soup.find_all('a') if a.get('href')]
+    except Exception as e:
+        logging.error(f"Error fetching {url}: {e}")
+        return []
 
-    def extract_links(url):
-        """Extract all absolute HTTP(S) links from <a> tags on a page"""
-        try:
-            response = requests.get(url, timeout=10)
-            soup = BeautifulSoup(response.text, "html.parser")
-            links = set()
+async def recursive_crawl(url, delay=1):  # Be nice to the server
+    if url in visited:
+        return
+    
+    if 'dfrobot' not in url:
+        logging.info(f"Skipping URL without keyword: {url}")
+        return
+    
+    visited.add(url)
+    logging.info(f"Processing: {url}")
+    links = await extract_links(url)
+    for link in links:
+        await asyncio.sleep(delay)  # Be nice to the server
+        await recursive_crawl(link)
 
-            for a_tag in soup.find_all("a", href=True):
-                href = a_tag["href"]
-                full_url = urljoin(url, href)
-                if full_url.startswith("http"):
-                    links.add(full_url)
-
-            return links
-        except Exception as e:
-            logging.warning(f"Failed to extract links from {url}: {e}")
-            return set()
-
-    def crawl(url, depth):
-        if url in visited_urls or depth > max_depth:
-            return
-
-        visited_urls.add(url)
-
-        try:
-            pages = WebBaseLoader(url).load()
-            title = pages[0].metadata.get("title", url)
-            url_to_documents[title] = pages
-            logging.info(f"[depth={depth}] Loaded '{title}' from {url}")
-        except Exception as e:
-            logging.warning(f"Failed to load {url}: {e}")
-            return
-
-        for link in extract_links(url):
-            crawl(link, depth + 1)
-
-    crawl(source_url, depth=0)
-    return url_to_documents
+if __name__ == "__main__":
+    start_url = "https://www.dfrobot.com.cn/"
+    logging.info(f"Starting crawl at {start_url}")
+    asyncio.run(recursive_crawl(start_url))
+    
+    # Save links to a file
+    with open('links.txt', 'w') as f:
+        for link in visited:
+            f.write(link + '\n')
+    
+    logging.info(f"Crawl completed. {len(visited)} links found.")
