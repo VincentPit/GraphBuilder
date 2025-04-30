@@ -1,9 +1,9 @@
-import asyncio
-import aiohttp
+import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import logging
 import os
+import time
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -14,18 +14,18 @@ VISITED_FILE = 'visited_links.txt'
 # Set up visited set (this will store visited URLs)
 visited = set()
 
-async def extract_links(url):
+def extract_links(url):
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
-                return [urljoin(url, a.get('href')) for a in soup.find_all('a') if a.get('href')]
+        response = requests.get(url)
+        response.raise_for_status()  # Ensure we raise an error for bad responses
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        return [urljoin(url, a.get('href')) for a in soup.find_all('a') if a.get('href')]
     except Exception as e:
         logging.error(f"Error fetching {url}: {e}")
         return []
 
-async def recursive_crawl(url, limit, delay=0.05):  # Be nice to the server
+def recursive_crawl(url, limit, delay=0.02):  # Be nice to the server
     if url in visited:
         return
 
@@ -39,12 +39,18 @@ async def recursive_crawl(url, limit, delay=0.05):  # Be nice to the server
 
     visited.add(url)
     logging.info(f"Processing: {url} (Visited: {len(visited)})")
-    links = await extract_links(url)
+    links = extract_links(url)
     for link in links:
         if len(visited) >= limit:
+            logging.info(f"Limit {limit} reached.")
             break  # Stop if the limit is reached
-        await asyncio.sleep(delay)  # Be nice to the server
-        await recursive_crawl(link, limit)
+        
+        if link == url:
+            continue #visited
+        
+        # Be nice to the server
+        time.sleep(delay)  
+        recursive_crawl(link, limit)
 
 def load_visited_links():
     """Load previously visited links from a file."""
@@ -60,8 +66,6 @@ def save_visited_links():
             f.write(link + '\n')
 
 if __name__ == "__main__":
-    start_url = "https://www.dfrobot.com.cn/"
-    crawl_limit = 1000 # Set a limit on how many links you want to crawl
     start_urls = [
         "https://www.dfrobot.com.cn/", 
         "https://makelog.dfrobot.com.cn/", 
@@ -69,14 +73,15 @@ if __name__ == "__main__":
         "https://www.dfrobot.com.cn/index.php", 
         "https://wiki.dfrobot.com.cn/"
     ]
-    
-    
+    crawl_limit = 1000  # Set a limit on how many links you want to crawl
+
     # Load previously visited links
     visited = load_visited_links()
     logging.info(f"Loaded {len(visited)} previously visited links.")
+    
     for start_url in start_urls:
         logging.info(f"Starting crawl at {start_url}")
-        asyncio.run(recursive_crawl(start_url, crawl_limit))
+        recursive_crawl(start_url, crawl_limit)
 
     # Save the visited links to a file
     save_visited_links()

@@ -1,17 +1,11 @@
 import os
 import json
 import logging
-import time
 from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 from dbAccess import graphDBdataAccess
 from processing import create_source_node_graph_dfrobot_url, extract_graph_from_web_page
 from shared.common_fn import create_graph_database_connection
-from concurrent.futures import wait
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -23,7 +17,7 @@ processed_urls = set()
 queue = Queue()
 
 # Settings
-MAX_CRAWL_LIMIT = 2  # Limit the number of URLs to crawl
+MAX_CRAWL_LIMIT = 200  # Limit the number of URLs to crawl
 VISITED_FILE = 'record/visited_urls.json'
 PROCESSED_FILE = 'record/processed_urls.json'
 
@@ -43,18 +37,6 @@ def save_visited_and_processed():
         json.dump(list(visited), f)
     with open(PROCESSED_FILE, 'w') as f:
         json.dump(list(processed_urls), f)
-
-def extract_links(url):
-    """Extract all links from the page."""
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        html = response.text
-        soup = BeautifulSoup(html, 'html.parser')
-        return [urljoin(url, a.get('href')) for a in soup.find_all('a') if a.get('href')]
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error fetching {url}: {e}")
-        return []
 
 def process_url(graph, model, allowed_nodes, allowed_relationship, url):
     """Crawl and process a single URL."""
@@ -86,39 +68,13 @@ def process_url(graph, model, allowed_nodes, allowed_relationship, url):
     # Save after processing each URL to avoid losing progress
     save_visited_and_processed()
 
-    # Extract and queue the new links for crawling
-    links = extract_links(url)
-    for link in links:
-        if len(processed_urls) < MAX_CRAWL_LIMIT:
-            queue.put(link)  # Add the new link to the queue
-        else:
-            logging.info(f"URL limit reached: {MAX_CRAWL_LIMIT}, here are the processed  {processed_urls}")
 
-def crawl_urls_in_parallel(graph, model, allowed_nodes, allowed_relationship, delay=1, max_workers=5):
-    """Crawl URLs in parallel and process them."""
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = []
-        while not queue.empty() and len(processed_urls) < MAX_CRAWL_LIMIT:
-            url = queue.get()
-            future = executor.submit(process_url, graph, model, allowed_nodes, allowed_relationship, url)
-            futures.append(future)
-            time.sleep(delay)  # Be nice to the server
-        
-        # Wait for all submitted tasks to finish
-        wait(futures)
-        
-        if len(processed_urls) >= MAX_CRAWL_LIMIT:
-            logging.info(f"URL limit reached: {MAX_CRAWL_LIMIT}, here are the processed {processed_urls}")
-        else:
-            logging.info("Queue is empty")
 
-def main(start_urls, graph, model, allowed_nodes, allowed_relationship):
+def main(urls, graph, model, allowed_nodes, allowed_relationship):
     # Enqueue all the starting URLs
-    for url in start_urls:
-        queue.put(url)
+    for url in urls:
+        process_url(graph, model, allowed_nodes, allowed_relationship, url)
 
-    # Start crawling and processing URLs in parallel
-    crawl_urls_in_parallel(graph, model, allowed_nodes, allowed_relationship)
 
 if __name__ == "__main__":
     # To Be Modified
@@ -132,21 +88,14 @@ if __name__ == "__main__":
     
     graph = create_graph_database_connection(uri, userName, password, database)
     graphDb_data_Access = graphDBdataAccess(graph)
+    path ='visited_links.txt'
+    with open(path, 'r') as file:
+        all_urls = file.read().splitlines()
+        urls = all_urls[:200]
 
-    start_urls = [
-        "https://www.dfrobot.com.cn/", 
-        "https://makelog.dfrobot.com.cn/", 
-        "https://mc.dfrobot.com.cn/", 
-        "https://www.dfrobot.com.cn/index.php", 
-        "https://wiki.dfrobot.com.cn/"
-    ]
+    logging.info(f"Starting crawl with initial URLs from: {path}")
 
-    logging.info(f"Starting crawl with initial URLs: {start_urls}")
-
-    # Load visited and processed URLs from files
-    load_visited_and_processed()
-
-    main(start_urls, graph, model, allowedNodes, allowedRelationships)
-    logging.info(f"Done Crawling. Starting to save. visited: {visited}; processed: {processed_urls}")
+    main(urls, graph, model, allowedNodes, allowedRelationships)
+    logging.info(f"Done Processing all the urls. Starting to save. visited: {visited}; processed: {processed_urls}")
     # Save visited and processed URLs when finished
     save_visited_and_processed()

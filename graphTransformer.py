@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/7/14 22:06
-# @Author  : nongbin
-# @FileName: llm.py
-# @Software: PyCharm
-# @Affiliation: tfswufe.edu.cn
-
 import asyncio
 import json
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union, cast

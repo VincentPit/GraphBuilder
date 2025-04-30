@@ -30,8 +30,11 @@ COPY environment.yml /code/
 # Create the Conda environment called 'graph' from the environment.yml
 RUN conda env create -f /code/environment.yml
 
+
 # Set the default environment to 'graph' and activate it
-SHELL ["conda", "run", "-n", "graph", "/bin/bash", "-c"]
+SHELL ["/bin/bash", "-c"]
+
+RUN conda activate graph && pip install -r condaenv.rnehk3uw.requirements.txt
 
 # Expose the necessary port
 ENV PORT 8000
