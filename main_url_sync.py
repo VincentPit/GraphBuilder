@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-from queue import Queue
 from threading import Lock
 from dbAccess import graphDBdataAccess
 from processing import create_source_node_graph_dfrobot_url, extract_graph_from_web_page
@@ -14,7 +13,6 @@ logging.basicConfig(level=logging.INFO)
 visited_lock = Lock()
 visited = set()
 processed_urls = set()
-queue = Queue()
 
 # Settings
 MAX_CRAWL_LIMIT = 200  # Limit the number of URLs to crawl
@@ -59,6 +57,7 @@ def process_url(graph, model, allowed_nodes, allowed_relationship, url):
 
     # Then, extract the graph from the page
     result_dic = extract_graph_from_web_page(graph, model, url, allowed_nodes, allowed_relationship)
+    
     logging.info(f"Extracted graph data from {url}: {result_dic}")
 
     # Add to processed URLs
@@ -71,7 +70,6 @@ def process_url(graph, model, allowed_nodes, allowed_relationship, url):
 
 
 def main(urls, graph, model, allowed_nodes, allowed_relationship):
-    # Enqueue all the starting URLs
     for url in urls:
         process_url(graph, model, allowed_nodes, allowed_relationship, url)
 

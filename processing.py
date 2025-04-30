@@ -380,13 +380,15 @@ def get_documents_from_web_page(source_url:str):
         file_name = pages[0].metadata['title']
         return file_name, pages
     except Exception as e:
-        logging.error(f"Failed To Process Web URL: {file_name}")
+        logging.error(f"Failed To Process Web URL: {source_url}")
         logging.exception(f'Exception Stack trace: {e}')
+        return None, None
         
 def extract_graph_from_web_page(graph, model, source_url, allowedNodes, allowedRelationship):
     file_name, pages = get_documents_from_web_page(source_url)
     if pages==None or len(pages)==0:
-        raise Exception(f'Content is not available for given URL : {file_name}')
+        logging.exception(f'Content is not available for given URL : {source_url}')
+        return None
 
     return processing_source(graph, model, file_name, pages, allowedNodes, allowedRelationship)
 
@@ -406,22 +408,28 @@ def create_source_node_graph_dfrobot_url(graph, model, source_url, source_type):
         failed_count+=1
         message = f"Unable to read data for given url : {source_url}"
         raise Exception(message)
-    obj_source_node = sourceNode()
-    obj_source_node.file_type = 'text'
-    obj_source_node.file_source = source_type
-    obj_source_node.model = model
-    obj_source_node.total_pages = 1
-    obj_source_node.url = urllib.parse.unquote(source_url)
-    obj_source_node.created_at = datetime.now()
-    obj_source_node.file_name = pages[0].metadata['title']
-    obj_source_node.language = pages[0].metadata['language'] 
-    obj_source_node.file_size = sys.getsizeof(pages[0].page_content)
+    try:
+        obj_source_node = sourceNode()
+        obj_source_node.file_type = 'text'
+        obj_source_node.file_source = source_type
+        obj_source_node.model = model
+        obj_source_node.total_pages = 1
+        obj_source_node.url = urllib.parse.unquote(source_url)
+        obj_source_node.created_at = datetime.now()
+        obj_source_node.file_name = pages[0].metadata['title']
+        obj_source_node.language = pages[0].metadata['language'] 
+        obj_source_node.file_size = sys.getsizeof(pages[0].page_content)
     
-    graphDb_data_Access = graphDBdataAccess(graph)
-    graphDb_data_Access.create_source_node(obj_source_node)
-    lst_file_name.append({'fileName':obj_source_node.file_name,'fileSize':obj_source_node.file_size,'url':obj_source_node.url,'status':'Success'})
-    success_count+=1
-    return lst_file_name,success_count,failed_count
+    
+        graphDb_data_Access = graphDBdataAccess(graph)
+        graphDb_data_Access.create_source_node(obj_source_node)
+        lst_file_name.append({'fileName':obj_source_node.file_name,'fileSize':obj_source_node.file_size,'url':obj_source_node.url,'status':'Success'})
+        success_count+=1
+        return lst_file_name,success_count,failed_count
+    
+    except Exception as e:
+        logging.error(f"Error processing source node: {str(e)}. Received metadata {str(pages[0].metadata)}")
+        return None, 0, 1
 
 def create_source_node_graph_json(graph, model, source_json_path):
     """
