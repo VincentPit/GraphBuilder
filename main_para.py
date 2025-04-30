@@ -84,8 +84,8 @@ def main(urls, model, allowed_nodes, allowed_relationship):
 
     # Create a multiprocessing Manager to share visited and processed sets
     with Manager() as manager:
-        visited = set(manager.list()) # Use manager.set() to maintain unique values (set behavior)
-        processed_urls = set(manager.list())  # Use manager.set() to maintain unique values (set behavior)
+        visited = set(manager.list()) 
+        processed_urls = set(manager.list())  
 
         # Load previously visited and processed URLs if they exist
         loaded_visited, loaded_processed = load_visited_and_processed()
