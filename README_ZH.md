@@ -97,7 +97,7 @@ python main_json.py
 
 如果你需要抓取URL并处理它们，可以使用以下命令：
 
-* 使用 `python main_url_sync.py` 抓取URL。
+* 使用 `python main_url_sync.py` 抓取URL， 单线程处理。
 * 使用 `python main_url.py` 进行多线程处理。
 
 ### 先抓取所有链接后再构建图谱
@@ -115,6 +115,11 @@ python main_para.py
 ```
 
 来并行处理这些URL。
+
+每次重新运行代码前 最好先清楚.txt文件。
+```bash
+rm *.txt
+```
 
 ## 潜力
 

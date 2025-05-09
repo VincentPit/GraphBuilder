@@ -13,7 +13,7 @@ Chinese version of README.md is here https://github.com/VincentPit/GraphBuilder/
 
 ## Installation
 
-Instructions on how to install or set up the project.
+Instructions on how to install and set up the project.
 
 ```bash
 git clone https://github.com/VincentPit/GraphBuilder.git
