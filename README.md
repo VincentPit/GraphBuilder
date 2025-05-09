@@ -59,7 +59,7 @@ Download APOC from ![apoc](https://github.com/neo4j/apoc/releases/download/5.21.
 
 Try and run ```bash python main_test.py``` to see if any error pops up. Solve them before proceed.
 
-##Usage
+## Usage
 
 If you have local Json files and want to build Knowlege Graph with them. If you wish to do so by batch, use sample_fromJson.py to specify and get what items in the Json file intended.
 Then, by specifying file name of Json, run ```bash python main_json.py``` to start building graph. 
