@@ -55,13 +55,9 @@ dbms.security.procedures.allowlist=apoc.coll.*,apoc.load.*,apoc.*
 ```
 Find the plugins directory of your local neo4j. 
 
-Download APOC from ![here](https://github.com/neo4j/apoc/releases/download/5.21.0/apoc-5.21.0-core.jar) and place the file in plugins. 
+Download APOC from ![apoc](https://github.com/neo4j/apoc/releases/download/5.21.0/apoc-5.21.0-core.jar) and place the file in plugins. 
 
-Try and run ```bash 
-
-python main_test.py
-
-``` to see if any error pops up. Solve them before proceed.
+Try and run ```bash python main_test.py``` to see if any error pops up. Solve them before proceed.
 
 ##Usage
 
