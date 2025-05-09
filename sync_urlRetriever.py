@@ -73,7 +73,7 @@ if __name__ == "__main__":
         "https://www.dfrobot.com.cn/index.php", 
         "https://wiki.dfrobot.com.cn/"
     ]
-    crawl_limit = 1000  # Set a limit on how many links you want to crawl
+    crawl_limit = 100000  # Set a limit on how many links you want to crawl
 
     # Load previously visited links
     visited = load_visited_links()

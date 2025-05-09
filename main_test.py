@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 #To Be Modified
 uri = "bolt://localhost:7687"
 userName = "neo4j"
-password = "369369St"
+password = "neo4j"
 database = "neo4j"
 model = "azure_ai_gpt_4o"
 allowedNodes = "controller,sensor,board,actor,module"
