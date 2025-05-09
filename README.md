@@ -57,13 +57,21 @@ Find the plugins directory of your local neo4j.
 
 Download APOC from ![apoc](https://github.com/neo4j/apoc/releases/download/5.21.0/apoc-5.21.0-core.jar) and place the file in plugins. 
 
-Try and run ```bash python main_test.py``` to see if any error pops up. Solve them before proceed.
+Try and run ```bash 
+python main_test.py
+``` to see if any error pops up. Solve them before proceed.
 
 ## Usage
 
 If you have local Json files and want to build Knowlege Graph with them. If you wish to do so by batch, use sample_fromJson.py to specify and get what items in the Json file intended.
-Then, by specifying file name of Json, run ```bash python main_json.py``` to start building graph. 
+Then, by specifying file name of Json, run ```bash 
+python main_json.py
+``` to start building graph. 
 
-If you wish to fetch urls to process, use ```bash python main_url_sync.py``` or ```bash python main_url.py``` for multi-processing. 
+If you wish to fetch urls to process, use ```bash 
+python main_url_sync.py``` or ```bash 
+python main_url.py``` for multi-processing. 
 
-If you wish to fetch all links before proceeding to graph building, use ```bash python sync_urlRetriever.py``` first to fetch urls and run ```bash python main_para.py``` to process the urls in parallel. 
+If you wish to fetch all links before proceeding to graph building, use ```bash 
+python sync_urlRetriever.py``` first to fetch urls and run ```bash 
+python main_para.py``` to process the urls in parallel. 
