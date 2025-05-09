@@ -50,7 +50,7 @@ def process_url(model, allowed_nodes, allowed_relationship, url, visited, proces
     # Create a new graph connection in the worker
     uri = "bolt://localhost:7687"
     userName = "neo4j"
-    password = "369369St"
+    password = "neo4j"
     database = "neo4j"
     graph = create_graph_database_connection(uri, userName, password, database)
     graphDb_data_Access = graphDBdataAccess(graph)
