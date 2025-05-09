@@ -75,7 +75,8 @@ to start building graph.
 If you wish to fetch urls to process, use 
 ```bash 
 python main_url_sync.py
-``` or 
+``` 
+or 
 ```bash 
 python main_url.py
 ``` 
