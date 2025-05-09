@@ -1,7 +1,9 @@
 # GraphBuilder
 
 The project was built for DFRobot Co.. The objectives were to build a knowledge graph based on the company's webpages, so as to work with the RAG system. 
-The project was based on prior works of ![llm-graph-builder](https://github.com/BinNong/llm-graph-builder.git)
+
+The project was based on prior works of ![llm-graph-builder](https://github.com/BinNong/llm-graph-builder.git). 
+
 Chinese version of README.md is here https://github.com/VincentPit/GraphBuilder/blob/main/README_ZH.md. 
 ## Table of Contents
 
