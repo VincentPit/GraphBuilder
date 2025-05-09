@@ -7,7 +7,7 @@ The project was based on prior works of ![llm-graph-builder](https://github.com/
 
 - [Installation](#installation)
 - [Usage](#usage)
-
+- [Potential](#potential)
 
 ## Installation
 
@@ -57,6 +57,16 @@ Find the plugins directory of your local neo4j.
 
 Download APOC from ![apoc](https://github.com/neo4j/apoc/releases/download/5.21.0/apoc-5.21.0-core.jar) and place the file in plugins. 
 
+The last step needed to set up would be environment variable assignments:
+
+```bash 
+export UPDATE_GRAPH_CHUNKS_PROCESSED=20
+export EMBEDDING_MODEL=all-MiniLM-L6-v2
+export IS_EMBEDDING=TRUE
+export LLM_MODEL_CONFIG_azure_ai_gpt_4o= your_model,url,key,version
+export NUMBER_OF_CHUNKS_TO_COMBINE=6
+``` 
+
 Try and run 
 ```bash 
 python main_test.py
@@ -65,7 +75,7 @@ to see if any error pops up. Solve them before proceed.
 
 ## Usage
 
-If you have local Json files and want to build Knowlege Graph with them. If you wish to do so by batch, use sample_fromJson.py to specify and get what items in the Json file intended.
+If you have local Json files and want to build Knowledge Graph with them. If you wish to do so by batch, use sample_fromJson.py to specify and get what items in the Json file intended.
 Then, by specifying file name of Json, run 
 ```bash 
 python main_json.py
@@ -91,3 +101,10 @@ first to fetch urls and run
 python main_para.py
 ``` 
 to process the urls in parallel. 
+
+##Potential
+
+I am also trying to embed the pictures of the components. The visual embeddings could be placed as attributes to the component nodes.
+Since we are searching with text embeddings, so far there is only one type fo model that is available, that fits the task, CLIP. 
+If we are to use to CLIP, we need to embed all text with the same text processing model that has been used by the CLIP model we choose. 
+We need to switch the embedding model to CLIP's text model, and embed images with CLIP's visual model.
